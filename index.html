@@ -3,9 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test</title>
+    <title>Buzzer Décompte</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        #buzzer {
+            width: 50vmin;
+            height: 50vmin;
+            background-color: red;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 10vmin; /* Ajuste la taille de la police pour que les chiffres soient grands */
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            margin-top: 20px; /* Espace entre le texte et le buzzer */
+        }
+
+        #reset-button, #set-time-button {
+            position: fixed;
+            top: 10px;
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #reset-button {
+            right: 10px;
+            background-color: #007bff;
+        }
+
+        #set-time-button {
+            left: 10px;
+            background-color: #28a745;
+        }
+
+        #current-time {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>test</h1>
+    <button id="set-time-button">Définir le Temps</button>
+    <div id="current-time">Temps actuel : 10 secondes</div>
+    <div id="buzzer">10</div>
+    <button id="reset-button">Réinitialiser</button>
+
+    <script>
+        let countdown;
+        let timeLeft = 10;
+        let initialTime = 10;
+        let countdownEnded = false;
+
+        function updateBuzzerText() {
+            document.getElementById('buzzer').textContent = timeLeft > 0 ? timeLeft : "Temps écoulé !";
+        }
+
+        function updateCurrentTimeText() {
+            document.getElementById('current-time').textContent = `Temps actuel : ${initialTime} secondes`;
+        }
+
+        function startCountdown() {
+            clearInterval(countdown);
+            countdownEnded = false;
+            countdown = setInterval(() => {
+                timeLeft--;
+                updateBuzzerText();
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    countdownEnded = true;
+                    document.getElementById('buzzer').textContent = "Temps écoulé !";
+                }
+            }, 1000);
+        }
+
+        document.getElementById('buzzer').addEventListener('click', () => {
+            // Redémarre le décompte quel que soit l'état (en cours, réinitialisé, terminé)
+            timeLeft = initialTime;
+            updateBuzzerText();
+            startCountdown();
+        });
+
+        document.getElementById('reset-button').addEventListener('click', () => {
+            clearInterval(countdown);
+            timeLeft = 0;
+            countdownEnded = true;
+            updateBuzzerText();
+        });
+
+        document.getElementById('set-time-button').addEventListener('click', () => {
+            const time = prompt('Définir la durée du décompte en secondes :');
+            if (time && !isNaN(time) && time > 0) {
+                initialTime = parseInt(time, 10);
+                timeLeft = initialTime;
+                updateCurrentTimeText();
+                updateBuzzerText();
+            }
+        });
+
+        // Initial update to display the initial time
+        updateBuzzerText();
+        updateCurrentTimeText();
+    </script>
 </body>
 </html>
