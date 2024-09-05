@@ -25,11 +25,11 @@
             justify-content: center;
             align-items: center;
             color: white;
-            font-size: 10vmin; /* Ajuste la taille de la police pour que les chiffres soient grands */
+            font-size: 10vmin;
             text-align: center;
             cursor: pointer;
             user-select: none;
-            margin-top: 20px; /* Espace entre le texte et le buzzer */
+            margin-top: 20px;
         }
 
         #reset-button, #set-time-button {
@@ -66,11 +66,13 @@
     <div id="buzzer">10</div>
     <button id="reset-button">Réinitialiser</button>
 
+    <!-- Remplacement du script d'origine par le nouveau script -->
     <script>
         let countdown;
         let timeLeft = 10;
         let initialTime = 10;
         let countdownEnded = false;
+        const audio = new Audio('son.mp3'); // Charge le fichier son
 
         function updateBuzzerText() {
             document.getElementById('buzzer').textContent = timeLeft > 0 ? timeLeft : "Temps écoulé !";
@@ -91,6 +93,7 @@
                     clearInterval(countdown);
                     countdownEnded = true;
                     document.getElementById('buzzer').textContent = "Temps écoulé !";
+                    audio.play(); // Joue le son lorsque le temps est écoulé
                 }
             }, 1000);
         }
@@ -107,6 +110,8 @@
             timeLeft = 0;
             countdownEnded = true;
             updateBuzzerText();
+            audio.pause();  // Arrête le son si le décompte est réinitialisé
+            audio.currentTime = 0;  // Remet le son au début
         });
 
         document.getElementById('set-time-button').addEventListener('click', () => {
