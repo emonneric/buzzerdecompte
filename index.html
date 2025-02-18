@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buzzer Décompte</title>
+    <title>Buzzer Décompte Rummikub</title>
     <style>
         body {
             margin: 0;
@@ -14,6 +14,16 @@
             align-items: center;
             background-color: #f4f4f4;
             font-family: Arial, sans-serif;
+        }
+
+        #buzzer-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
         }
 
         #buzzer {
@@ -27,9 +37,6 @@
             color: white;
             font-size: 10vmin;
             text-align: center;
-            cursor: pointer;
-            user-select: none;
-            margin-top: 20px;
         }
 
         #reset-button, #set-time-button {
@@ -41,6 +48,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            z-index: 1;
         }
 
         #reset-button {
@@ -63,25 +71,30 @@
 <body>
     <button id="set-time-button">Définir le Temps</button>
     <div id="current-time">Temps actuel : 10 secondes</div>
-    <div id="buzzer">10</div>
+    <div id="buzzer-container">
+        <div id="buzzer">10</div>
+    </div>
     <button id="reset-button">Réinitialiser</button>
 
-    <!-- Remplacement du script d'origine par le nouveau script -->
     <script>
         let countdown;
         let timeLeft = 10;
         let initialTime = 10;
         let countdownEnded = false;
         const audio = new Audio('son.mp3'); // Charge le fichier son
+        const bipAudio = new Audio('bip.mp3'); // Charge le fichier son pour le bip
 
+        // Met à jour le texte affiché dans le buzzer
         function updateBuzzerText() {
             document.getElementById('buzzer').textContent = timeLeft > 0 ? timeLeft : "Temps écoulé !";
         }
 
+        // Met à jour le texte du temps actuel
         function updateCurrentTimeText() {
             document.getElementById('current-time').textContent = `Temps actuel : ${initialTime} secondes`;
         }
 
+        // Démarre le compte à rebours
         function startCountdown() {
             clearInterval(countdown);
             countdownEnded = false;
@@ -93,27 +106,36 @@
                     clearInterval(countdown);
                     countdownEnded = true;
                     document.getElementById('buzzer').textContent = "Temps écoulé !";
-                    audio.play(); // Joue le son lorsque le temps est écoulé
+                    audio.play().catch(error => {
+                        console.error("Erreur lors de la lecture du son :", error);
+                    }); // Joue le son lorsque le temps est écoulé
                 }
             }, 1000);
         }
 
-        document.getElementById('buzzer').addEventListener('click', () => {
-            // Redémarre le décompte quel que soit l'état (en cours, réinitialisé, terminé)
+        // Ajoute un écouteur d'événement pour le clic sur le buzzer
+        document.getElementById('buzzer-container').addEventListener('click', () => {
+            if (!countdownEnded) {
+                bipAudio.play().catch(error => {
+                    console.error("Erreur lors de la lecture du bip :", error);
+                }); // Joue un bip lorsque le décompte est lancé
+            }
             timeLeft = initialTime;
             updateBuzzerText();
             startCountdown();
         });
 
+        // Ajoute un écouteur d'événement pour le bouton de réinitialisation
         document.getElementById('reset-button').addEventListener('click', () => {
             clearInterval(countdown);
             timeLeft = 0;
             countdownEnded = true;
             updateBuzzerText();
-            audio.pause();  // Arrête le son si le décompte est réinitialisé
-            audio.currentTime = 0;  // Remet le son au début
+            audio.pause(); // Arrête le son si le décompte est réinitialisé
+            audio.currentTime = 0; // Remet le son au début
         });
 
+        // Ajoute un écouteur d'événement pour le bouton de définition du temps
         document.getElementById('set-time-button').addEventListener('click', () => {
             const time = prompt('Définir la durée du décompte en secondes :');
             if (time && !isNaN(time) && time > 0) {
@@ -124,7 +146,7 @@
             }
         });
 
-        // Initial update to display the initial time
+        // Met à jour le texte initial du buzzer et du temps actuel lors du chargement de la page
         updateBuzzerText();
         updateCurrentTimeText();
     </script>
