@@ -108,11 +108,16 @@
                     clearInterval(countdown);
                     countdownEnded = true;
                     document.getElementById('buzzer').textContent = "Temps écoulé !";
-                    audio.play().catch(error => {
-                        console.error("Erreur lors de la lecture du son :", error);
-                    }); // Joue le son lorsque le temps est écoulé
+                    playEndSound(); // Joue le son lorsque le temps est écoulé
                 }
             }, 1000);
+        }
+
+        // Joue le son de fin de décompte
+        function playEndSound() {
+            audio.play().catch(error => {
+                console.error("Erreur lors de la lecture du son :", error);
+            });
         }
 
         // Ajoute un écouteur d'événement pour le clic sur le buzzer
@@ -149,6 +154,13 @@
         // Met à jour le texte initial du buzzer et du temps actuel lors du chargement de la page
         updateBuzzerText();
         updateCurrentTimeText();
+
+        // Joue un son pour s'assurer que l'audio est chargé correctement
+        document.addEventListener('click', () => {
+            audio.play().catch(error => {
+                console.error("Erreur lors de la lecture du son :", error);
+            });
+        }, { once: true });
     </script>
 </body>
 </html>
